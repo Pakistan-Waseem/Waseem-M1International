@@ -2,14 +2,10 @@
  * 
  */
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.SetMultimap;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,7 +23,7 @@ import java.util.SortedSet;
  */
 public final class MyMultimap<K,V> implements Multimap<K, V> {
 
-	private static final int VALUESPER_KEY = 10; 
+	private static final int VALUESPER_KEY = 5; 
 	transient int expectedValuesPerKey;
 	
 	private transient Map<K, Collection<V>> map;
@@ -50,7 +46,7 @@ public final class MyMultimap<K,V> implements Multimap<K, V> {
 		// TODO Auto-generated constructor stub
 		Maps.<K, Collection<V>>newHashMapWithExpectedSize(expectedKeys);
 		    checkArgument(expectedValuesPerKey >= 0);
-	        this.expectedValuesPerKey = expectedValuesPerKey;
+	        this.expectedValuesPerKey = expectedValuesPerKey2;
 	}
 	public int size() {
 		// TODO Auto-generated method stub
@@ -107,7 +103,32 @@ public final class MyMultimap<K,V> implements Multimap<K, V> {
 	}
 	public boolean remove(Object key, Object value) {
 		// TODO Auto-generated method stub
-		return false;
+		 Collection<V> collection = map.get(key);
+		      if (collection == null) {
+		        return false;
+		      }
+		  
+		      boolean changed = collection.remove(value);
+		      if (changed) {
+		        totalSize--;
+		        if (collection.isEmpty()) {
+		          map.remove(key);
+		        }
+		      }
+		     return changed;
+	}
+	public Collection<V> removeAll(Object key) {
+		// TODO Auto-generated method stub
+		Collection<V> collection = map.remove(key);
+		     Collection<V> output = createCollection();
+		 
+		     if (collection != null) {
+		       output.addAll(collection);
+		       totalSize -= collection.size();
+		       collection.clear();
+		     }
+		 
+		     return unmodifiableCollectionSubclass(output);
 	}
 	public boolean putAll(K key, Iterable<? extends V> values) {
 		// TODO Auto-generated method stub
@@ -119,7 +140,7 @@ public final class MyMultimap<K,V> implements Multimap<K, V> {
 			 
 			     boolean changed = false;
 			     if (values  instanceof Collection) {
-			       Collection<? extends V> c = Collections2.cast(values);
+			       Collection<? extends V> c = (Collection<? extends V>)values;
 			       changed = collection.addAll(c);
 			     } else {
 			       for (V value : values) {
@@ -172,19 +193,7 @@ public final class MyMultimap<K,V> implements Multimap<K, V> {
 			       return Collections.unmodifiableCollection(collection);
 			     }
 			   }
-	public Collection<V> removeAll(Object key) {
-		// TODO Auto-generated method stub
-		Collection<V> collection = map.remove(key);
-		     Collection<V> output = createCollection();
-		 
-		     if (collection != null) {
-		       output.addAll(collection);
-		       totalSize -= collection.size();
-		       collection.clear();
-		     }
-		 
-		     return unmodifiableCollectionSubclass(output);
-	}
+	
 	public void clear() {
 		// TODO Auto-generated method stub
 		for (Collection<V> collection : map.values()) {
@@ -204,13 +213,25 @@ public final class MyMultimap<K,V> implements Multimap<K, V> {
 	}
 	public Multiset<K> keys() {
 		// TODO Auto-generated method stub
+		 Set<Entry<K, Collection<V>>> set = map.entrySet();
+	     Iterator<Entry<K, Collection<V>>> i = set.iterator();
+	      while(i.hasNext()) {
+	         @SuppressWarnings("rawtypes")
+			 Map.Entry me = (Map.Entry)i.next();
+	         System.out.print(me.getKey() + ": ");
+	      }
 		return null;
 	}
 	public Collection<V> values() {
 		// TODO Auto-generated method stub
-		return null;
+		Collection<V> Values=new ArrayList<V>();
+		for (Collection<V> collection : map.values()) {
+		       Values.addAll(collection);
+		     }
+		return Values;
 	}
 	public Collection<Entry<K, V>> entries() {
+		return null;
 		// TODO Auto-generated method stub
 	}
 	public Map<K, Collection<V>> asMap() {

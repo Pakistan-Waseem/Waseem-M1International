@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 /**
  * @author waseem
  *
@@ -21,7 +22,6 @@ public class GuavaMultimap {
 	public void testMultimap() {
 		// TODO Auto-generated method stub
 	      Multimap<String,String> multimap = getMultimap();
-
 	      List<String> lowerList = (List<String>)multimap.get("lower");
 	      System.out.println("Initial lower case list");
 	      System.out.println(lowerList.toString());
@@ -30,6 +30,8 @@ public class GuavaMultimap {
 	      
 	      System.out.println("Modified lower case list");
 	      System.out.println(lowerList.toString());
+	      Multiset<String> keysMultiset=multimap.keys();
+	      System.out.println(keysMultiset.size());
 	      
 	      lowerList = (List<String>)multimap.get("lower");
 	      System.out.println("Modified lower case list");
